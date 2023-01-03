@@ -4,7 +4,7 @@ import Movies from "../screen/Movies";
 import MyPage from "../screen/MyPage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
-import { DARK_COLOR, WHITE_COLOR } from "../colors";
+import { BLACK_COLOR, BLUE_COLOR, WHITE_COLOR, YELLOW_COLOR } from "../colors";
 import { DarkTheme, DefaultTheme } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
@@ -19,7 +19,8 @@ const Bottom = () => {
       }}
       screenOptions={{
         tabBarLabelPosition: "beside-icon",
-        tabBarActiveTintColor: "#fb8c00",
+        tabBarActiveTintColor: isDark ? YELLOW_COLOR : BLUE_COLOR,
+        headerTintColor: isDark ? YELLOW_COLOR : BLACK_COLOR,
       }}
     >
       <Tab.Screen
