@@ -4,14 +4,18 @@ import { ActivityIndicator, StyleSheet } from "react-native";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Swiper from "react-native-swiper";
+import { getImgPath, getPath } from "../util";
+import { useNavigation } from "@react-navigation/native";
 
-const MainMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
+const MainMovies = () => {
+  const { navigate } = useNavigation();
+
   const [nowPlayings, setNowPlayings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const Now_Playings = async () => {
-    const { results } = await fetch(
-      `${BASE_URL}/now_playing?api_key=${API_KEY}&language=en-US&page=1`
-    ).then((res) => res.json());
+    const { results } = await fetch(getPath("now_playing")).then((res) =>
+      res.json()
+    );
     setNowPlayings(results);
     setIsLoading(false);
   };
@@ -28,11 +32,19 @@ const MainMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
     <Swiper height="100%" showsPagination={false} autoplay loop>
       {nowPlayings.map((movie) => {
         return (
-          <MainMoviebox key={movie.id}>
+          <MainMoviebox
+            key={movie.id}
+            onPress={() =>
+              navigate("Stacks", {
+                screen: "Detail",
+                params: { movieId: movie.id },
+              })
+            }
+          >
             <Image
               style={StyleSheet.absoluteFill}
               source={{
-                uri: `${BASE_URL_IMAGE}${movie.poster_path}`,
+                uri: getImgPath(movie.backdrop_path),
               }}
             />
             <LinearGradient
@@ -42,7 +54,7 @@ const MainMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
             <MainMovieIntroBox>
               <MainMovieImage2
                 source={{
-                  uri: `${BASE_URL_IMAGE}${movie.poster_path}`,
+                  uri: getImgPath(movie.poster_path),
                 }}
               />
               <MainMovieSection>
@@ -50,7 +62,10 @@ const MainMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
                 <MainMovieSectionStar>
                   ⭐{movie.vote_average}/10
                 </MainMovieSectionStar>
-                <MainMovieSectionText>{movie.overview}</MainMovieSectionText>
+                <MainMovieSectionText>
+                  {movie.overview.slice(0, 140)}
+                  {movie.overview.length > 140 && "..."}
+                </MainMovieSectionText>
               </MainMovieSection>
             </MainMovieIntroBox>
           </MainMoviebox>
@@ -70,7 +85,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const MainMoviebox = styled.View`
+const MainMoviebox = styled.TouchableOpacity`
   width: 100%;
   height: 300px;
   background-color: yellow;

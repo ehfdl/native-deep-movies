@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
 import styled from "@emotion/native";
 import { View, Text, TouchableOpacity, Image } from "react-native";
+import { getImgPath, getPath } from "../util";
+import { useNavigation } from "@react-navigation/native";
 
-const UpComingMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
+const UpComingMovies = () => {
+  const { navigate } = useNavigation();
+
   const [upComing, setUpComing] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const Up_Coming = async () => {
-    const { results } = await fetch(
-      `${BASE_URL}/upcoming?api_key=${API_KEY}&language=en-US&page=1`
-    ).then((res) => res.json());
+    const { results } = await fetch(getPath("upcoming")).then((res) =>
+      res.json()
+    );
     setUpComing(results);
     setIsLoading(false);
   };
@@ -26,10 +30,18 @@ const UpComingMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
       <UpcomingMoviesTitle>Upcoming Movies</UpcomingMoviesTitle>
       {upComing.map((movie) => {
         return (
-          <UpcomingMoviesSection key={movie.id}>
+          <UpcomingMoviesSection
+            key={movie.id}
+            onPress={() =>
+              navigate("Stacks", {
+                screen: "Detail",
+                params: { movieId: movie.id },
+              })
+            }
+          >
             <UpcomingMoviesImage
               source={{
-                uri: `${BASE_URL_IMAGE}${movie.poster_path}`,
+                uri: getImgPath(movie.poster_path),
               }}
             />
             <UpcomingMoviesScript>
@@ -40,7 +52,8 @@ const UpComingMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
                 {movie.release_date}
               </UpcomingMoviesScriptDate>
               <UpcomingMoviesScriptText>
-                {movie.overview}
+                {movie.overview.slice(0, 90)}
+                {movie.overview.length > 90 && "..."}
               </UpcomingMoviesScriptText>
             </UpcomingMoviesScript>
           </UpcomingMoviesSection>
@@ -68,7 +81,7 @@ const UpcomingMoviesTitle = styled.Text`
   margin-bottom: 20px;
 `;
 
-const UpcomingMoviesSection = styled.View`
+const UpcomingMoviesSection = styled.TouchableOpacity`
   width: 100%;
   height: 150px;
   /* background-color: skyblue; */

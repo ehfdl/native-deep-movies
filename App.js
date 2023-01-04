@@ -12,7 +12,6 @@ import { darkTheme, lightTheme } from "./theme";
 
 const App = () => {
   const isDark = useColorScheme() === "dark";
-  console.log(isDark);
   return (
     <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
       <NavigationContainer theme={isDark ? DarkTheme : DefaultTheme}>

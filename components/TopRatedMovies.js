@@ -6,16 +6,20 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import styled from "@emotion/native";
+import { getImgPath, getPath } from "../util";
+import { useNavigation } from "@react-navigation/native";
 
-const TopRatedMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
+const TopRatedMovies = () => {
+  const { navigate } = useNavigation();
   const [topRated, setTopRated] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const Top_Rated = async () => {
-    const { results } = await fetch(
-      `${BASE_URL}/top_rated?api_key=${API_KEY}&language=en-US&page=1`
-    ).then((res) => res.json());
+    const { results } = await fetch(getPath("top_rated")).then((res) =>
+      res.json()
+    );
     setTopRated(results);
     setIsLoading(false);
   };
@@ -31,7 +35,40 @@ const TopRatedMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
   return (
     <TopRatedBox>
       <TopRatedTitle>Top Rated Movies</TopRatedTitle>
-      <TopRatedMovieList
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={topRated}
+        renderItem={({ item }) => {
+          return (
+            <TopRatedMovieSection
+              onPress={() =>
+                navigate("Stacks", {
+                  screen: "Detail",
+                  params: { movieId: item.id },
+                })
+              }
+            >
+              <TopRatedMovieImage
+                source={{
+                  uri: getImgPath(item.poster_path),
+                }}
+              />
+              <TopRatedMovieScriptView>
+                <TopRatedMovieStar>⭐{item.vote_average}/10</TopRatedMovieStar>
+                <TopRatedMovieText>
+                  {item.title.slice(0, 11)}
+                  {item.title.length > 11 && "..."}
+                </TopRatedMovieText>
+              </TopRatedMovieScriptView>
+            </TopRatedMovieSection>
+          );
+        }}
+        keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={<View style={{ width: 15 }} />}
+      />
+
+      {/* <TopRatedMovieList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       >
@@ -40,17 +77,20 @@ const TopRatedMovies = ({ BASE_URL, BASE_URL_IMAGE, API_KEY }) => {
             <TopRatedMovieSection>
               <TopRatedMovieImage
                 source={{
-                  uri: `${BASE_URL_IMAGE}${movie.poster_path}`,
+                  uri: getImgPath(movie.poster_path),
                 }}
               />
               <TopRatedMovieScriptView>
                 <TopRatedMovieStar>⭐{movie.vote_average}/10</TopRatedMovieStar>
-                <TopRatedMovieText>{movie.title}</TopRatedMovieText>
+                <TopRatedMovieText>
+                  {movie.title.slice(0, 11)}
+                  {movie.title.length > 11 && "..."}
+                </TopRatedMovieText>
               </TopRatedMovieScriptView>
             </TopRatedMovieSection>
           );
         })}
-      </TopRatedMovieList>
+      </TopRatedMovieList> */}
     </TopRatedBox>
   );
 };
@@ -69,6 +109,7 @@ const TopRatedTitle = styled.Text`
   font-weight: bold;
 
   color: ${(props) => props.theme.title};
+  margin-bottom: 10px;
 `;
 const TopRatedMovieList = styled.ScrollView`
   width: 100%;
@@ -78,10 +119,10 @@ const TopRatedMovieList = styled.ScrollView`
   flex-direction: row;
 `;
 
-const TopRatedMovieSection = styled.View`
+const TopRatedMovieSection = styled.TouchableOpacity`
   height: 100%;
   width: 120px;
-  margin-right: 15px;
+  /* margin-right: 15px; */
   background-color: white;
   border-radius: 10px;
   overflow: hidden;

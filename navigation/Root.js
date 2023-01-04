@@ -12,7 +12,6 @@ const Root = () => {
       }}
     >
       <Stack.Screen name="Bottom" component={Bottom} />
-
       <Stack.Screen name="Stacks" component={Stacks} />
     </Stack.Navigator>
   );
